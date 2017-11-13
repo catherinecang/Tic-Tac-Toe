@@ -10,14 +10,10 @@ $(function (){
 		if(curr_board[index]==='+'){
 			$(this).text('X');
 			curr_board = curr_board.substring(0, index) + 'x' + curr_board.substring(index + 1);
-			end = checkWin(curr_board);
-			if (checkWin(curr_board)!=''){
-				$("#result").text("WINNER: " + checkWin(curr_board) + " stop playing");
-				console.log(checkWin(curr_board));
-			}
-			doComputerMove();
-
-		}
+			checkWin(curr_board);
+			
+		doComputerMove();
+	}
 	});
 
 	function doComputerMove(){
@@ -41,16 +37,61 @@ $(function (){
 		move = "#" + String(move);
 		console.log("second board" + curr_board)
 		$(move).text('O');
-		if (checkWin(curr_board)!=''){
-			$("#result").text("WINNER: " + checkWin(curr_board) + " stop playing");
-			console.log(checkWin(curr_board));
-		}
+		checkWin(curr_board);
 	}
+	function genButton(){
+		var b = $('<button/>', {
+			text: "Restart",
+			id: 'restart',
+			click: function(){
+				location.reload();
 
-	function restart(){
+			}
+		})
+		return b;
+	}
+	/*function restart(){
 		$(".btn").text("");
 		curr_board = '+++++++++';
+		$("#result").html("");
+		$("#restart").html("");
+	}*/
+
+	function checkWin(curr_board){
+	var win = '';
+	if (
+        (curr_board[0] === 'x' && curr_board[1] === 'x' && curr_board[2] === 'x') ||
+        (curr_board[3] === 'x' && curr_board[4] === 'x' && curr_board[5] === 'x') ||
+        (curr_board[6] === 'x' && curr_board[7] === 'x' && curr_board[8] === 'x') ||
+        (curr_board[0] === 'x' && curr_board[3] === 'x' && curr_board[6] === 'x') ||
+        (curr_board[1] === 'x' && curr_board[4] === 'x' && curr_board[7] === 'x') ||
+        (curr_board[2] === 'x' && curr_board[5] === 'x' && curr_board[8] === 'x') ||
+        (curr_board[0] === 'x' && curr_board[4] === 'x' && curr_board[8] === 'x') ||
+        (curr_board[2] === 'x' && curr_board[4] === 'x' && curr_board[7] === 'x') 
+    ) {
+        win = 'x';
+    } else if (
+        (curr_board[0] === 'o' && curr_board[1] === 'o' && curr_board[2] === 'o') ||
+        (curr_board[3] === 'o' && curr_board[4] === 'o' && curr_board[5] === 'o') ||
+        (curr_board[6] === 'o' && curr_board[7] === 'o' && curr_board[8] === 'o') ||
+        (curr_board[0] === 'o' && curr_board[3] === 'o' && curr_board[6] === 'o') ||
+        (curr_board[1] === 'o' && curr_board[4] === 'o' && curr_board[7] === 'o') ||
+        (curr_board[2] === 'o' && curr_board[5] === 'o' && curr_board[8] === 'o') ||
+        (curr_board[0] === 'o' && curr_board[4] === 'o' && curr_board[8] === 'o') ||
+        (curr_board[2] === 'o' && curr_board[4] === 'o' && curr_board[7] === 'o') 
+    ) {
+        win = 'o';
+    } else if (curr_board.indexOf('+') === -1) {
+        win = '+';
+    }
+   if (win!=''){
+		$("#result").html("WINNER: " + win + " stop playing");
+		b = genButton();
+		$("#restart").append(b);
+		$('.btn').unbind('click');
+		
 	}
+}
 
 })
 function filterRemote(filtered){
@@ -91,33 +132,6 @@ function filterValue(solns){
 
 }
 
-function checkWin(curr_board){
-	if (
-        (curr_board[0] === 'x' && curr_board[1] === 'x' && curr_board[2] === 'x') ||
-        (curr_board[3] === 'x' && curr_board[4] === 'x' && curr_board[5] === 'x') ||
-        (curr_board[6] === 'x' && curr_board[7] === 'x' && curr_board[8] === 'x') ||
-        (curr_board[0] === 'x' && curr_board[3] === 'x' && curr_board[6] === 'x') ||
-        (curr_board[1] === 'x' && curr_board[4] === 'x' && curr_board[7] === 'x') ||
-        (curr_board[2] === 'x' && curr_board[5] === 'x' && curr_board[8] === 'x') ||
-        (curr_board[0] === 'x' && curr_board[4] === 'x' && curr_board[8] === 'x') ||
-        (curr_board[2] === 'x' && curr_board[4] === 'x' && curr_board[7] === 'x') 
-    ) {
-        return 'x';
-    } else if (
-        (curr_board[0] === 'o' && curr_board[1] === 'o' && curr_board[2] === 'o') ||
-        (curr_board[3] === 'o' && curr_board[4] === 'o' && curr_board[5] === 'o') ||
-        (curr_board[6] === 'o' && curr_board[7] === 'o' && curr_board[8] === 'o') ||
-        (curr_board[0] === 'o' && curr_board[3] === 'o' && curr_board[6] === 'o') ||
-        (curr_board[1] === 'o' && curr_board[4] === 'o' && curr_board[7] === 'o') ||
-        (curr_board[2] === 'o' && curr_board[5] === 'o' && curr_board[8] === 'o') ||
-        (curr_board[0] === 'o' && curr_board[4] === 'o' && curr_board[8] === 'o') ||
-        (curr_board[2] === 'o' && curr_board[4] === 'o' && curr_board[7] === 'o') 
-    ) {
-        return 'o';
-    } else if (curr_board.indexOf('+') === -1) {
-        return '+';
-    }
-    return '';
-}
+
 
 
