@@ -67,7 +67,7 @@ $(function (){
         (curr_board[1] === 'x' && curr_board[4] === 'x' && curr_board[7] === 'x') ||
         (curr_board[2] === 'x' && curr_board[5] === 'x' && curr_board[8] === 'x') ||
         (curr_board[0] === 'x' && curr_board[4] === 'x' && curr_board[8] === 'x') ||
-        (curr_board[2] === 'x' && curr_board[4] === 'x' && curr_board[7] === 'x') 
+        (curr_board[2] === 'x' && curr_board[4] === 'x' && curr_board[6] === 'x') 
     ) {
         win = 'x';
     } else if (
@@ -78,18 +78,21 @@ $(function (){
         (curr_board[1] === 'o' && curr_board[4] === 'o' && curr_board[7] === 'o') ||
         (curr_board[2] === 'o' && curr_board[5] === 'o' && curr_board[8] === 'o') ||
         (curr_board[0] === 'o' && curr_board[4] === 'o' && curr_board[8] === 'o') ||
-        (curr_board[2] === 'o' && curr_board[4] === 'o' && curr_board[7] === 'o') 
+        (curr_board[2] === 'o' && curr_board[4] === 'o' && curr_board[6] === 'o') 
     ) {
         win = 'o';
     } else if (curr_board.indexOf('+') === -1) {
         win = '+';
     }
    if (win!=''){
-		$("#result").html("WINNER: " + win + " stop playing");
-		b = genButton();
-		$("#restart").append(b);
-		$('.btn').unbind('click');
-		
+   		if(win === '+'){
+   			$("#result").html("It's a Tie!");
+   		}else{
+			$("#result").html("WINNER: " + win + " stop playing");
+			b = genButton();
+			$("#restart").append(b);
+			$('.btn').unbind('click');
+   		}
 	}
 }
 
