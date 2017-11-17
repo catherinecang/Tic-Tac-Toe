@@ -1,22 +1,30 @@
 //value is value for the player who just played
 $(function (){
 	var solns;
-	var next_board;
 	var move;
 	var curr_board = '+++++++++';
+	var toggleTutor = false;
 	
+	$("#tutor").click(function(){
+		toggleTutor = !toggleTutor;
+		if (toggleTutor==false){
+			removeAllClass(".square", true);
+		}
+		else{
+			labelVal();
+		}
+	})
 	$(".btn").click(function(){
 		index = parseInt($(this)[0].id) - 1;
 		if(curr_board[index]==='+'){
 			$(this).text('X');
+			removeAllClass(this, true);
 			curr_board = curr_board.substring(0, index) + 'x' + curr_board.substring(index + 1);
-			checkWin(curr_board);
-			
+			checkWin();	
 		doComputerMove();
 	}
 	});
-
-	function doComputerMove(){
+	function getMove(){
 		$.ajax({
 			type: "GET",
 			url: 'http://nyc.cs.berkeley.edu:8081/ttt/getNextMoveValues?',
@@ -24,40 +32,57 @@ $(function (){
 			data: {board: curr_board},
 			async: false,
 		}).done(function (resp) {
-			$("#current").html("Current Board State: " + curr_board)
 			solns = resp;
-			var filter = filterRemote(filterValue(resp['response']))
-			move = filter['move'];
-			$("#one").html("Next Move: " + move);
-			next_board = filter['board'];
-			$("#two").html("Next Board State: " + next_board);
+			//this next line below might be an issue
+			move = filterRemote(filterValue(resp['response']))['move'];
 		});
+	}
+	function doComputerMove(){
+		getMove();
 		var index = parseInt(move)-1
 		curr_board = curr_board.substring(0, index) + 'o' + curr_board.substring(index + 1);
 		move = "#" + String(move);
-		console.log("second board" + curr_board)
 		$(move).text('O');
-		checkWin(curr_board);
+		removeAllClass(move, true);
+		checkWin();
+		if(toggleTutor){
+		labelVal();}
 	}
 	function genButton(){
 		var b = $('<button/>', {
 			text: "Restart",
-			id: 'restart',
 			click: function(){
 				location.reload();
-
 			}
 		})
 		return b;
 	}
-	/*function restart(){
-		$(".btn").text("");
-		curr_board = '+++++++++';
-		$("#result").html("");
-		$("#restart").html("");
-	}*/
 
-	function checkWin(curr_board){
+	function labelVal(){
+		getMove();
+		console.log(solns["response"])
+		for (var i in solns["response"]){
+			button_num = "#" + String(solns["response"][i]["move"]);
+			soln_val = solns["response"][i]["value"];
+			removeAllClass(button_num), false;
+			if (soln_val==="tie"){
+				$(button_num).addClass("btn-outline-warning");
+			}
+			else if (soln_val==="lose"){
+				$(button_num).addClass("btn-outline-primary");
+			}
+			else if (soln_val==="win") {
+				$(button_num).addClass("btn-outline-danger");
+			}
+		}
+	}
+	function removeAllClass(button, normal){
+		$(button).removeClass("btn-outline-dark btn-outline-warning btn-outline-primary btn-outline-danger");
+		if(normal===true){
+			$(button).addClass("btn-outline-dark");
+		}
+	}
+	function checkWin(){
 	var win = '';
 	if (
         (curr_board[0] === 'x' && curr_board[1] === 'x' && curr_board[2] === 'x') ||
@@ -88,11 +113,11 @@ $(function (){
    		if(win === '+'){
    			$("#result").html("It's a Tie!");
    		}else{
-			$("#result").html("WINNER: " + win + " stop playing");
-			b = genButton();
-			$("#restart").append(b);
-			$('.btn').unbind('click');
+			$("#result").html("WINNER: " + win);
    		}
+   		b = genButton();
+		$("#restart").append(b);
+		$('.btn').unbind('click');
 	}
 }
 
@@ -104,18 +129,17 @@ function filterRemote(filtered){
 		remotes.push(filtered[i]['remoteness'])
 	}
 	if (val === 'lose'){
-		var min = Math.min.apply(Math, remotes)
-		filtered = filtered.filter(function (i){
-			return i['remoteness'] == min
-		})
+		var minMax = Math.min.apply(Math, remotes)
+	} else {
+		var minMax = Math.max.apply(Math, remotes)
 	}
-	else {
-		var max = Math.max.apply(Math, remotes)
-		filtered = filtered.filter(function (i){
-			return i['remoteness'] == max
+
+	filtered = filtered.filter(function (i){
+			return i['remoteness'] == minMax
 		})
-	}
-	return filtered[0];
+
+	random = Math.floor(Math.random()*filtered.length)
+	return filtered[random];
 }
 
 function filterValue(solns){
